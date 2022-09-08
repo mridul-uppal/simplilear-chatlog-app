@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="./css/style.css" rel="stylesheet" type="text/css">
+
+    <title>Chatting</title>
+    <!-- connetion standred path with socket library -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script src="app.js"></script> -->
+    <script type="text/JavaScript">
+         let socket = io() //connection
+        let name = localStorage.getItem('name')
+
+        socket.on('connect', (msg)=>{ 
+            document.getElementById("welcome").innerHTML = 'Welcome '+name+'<br>'
+         })
+
+         socket.on('disconnect',()=>{
+            localStorage.setItem('name', '')
+        console.log("Client disconnected")
+        })
+
+         socket.on('Server', (msg)=>{ //get data from server
+            let serverDiv = document.createElement('div')
+            serverDiv.className = 'box sb-left float-l'
+            serverDiv.innerText = msg
+            document.getElementById("output").appendChild(serverDiv);
+            serverDiv.scrollIntoView(true);
+         })
+
+         socket.on('Client', (msg)=>{ 
+            let clientDiv = document.createElement('div')
+            clientDiv.className = 'box sb-right float-r'
+            clientDiv.innerText = msg
+            document.getElementById("output").appendChild(clientDiv)
+            clientDiv.scrollIntoView(true);
+         })
+
+        sendInfo = ()=>{
+            let msg = document.getElementById("msg").value;
+            socket.emit('Client' ,msg)
+            document.getElementById("msg").value = ""
+         }
+     </script>
+</head>
+
+<body>
+    <div class="container ">
+        <div class="row col-10 rounded-div mx-auto my-5">
+            <div class="row">
+                <div class="row w-100">
+                    <div class="col-3">
+                        <form method="post" action="/chat">
+                            <input class="btn btn-purple" type="submit" value="Download Messages">
+                        </form>
+                    </div>
+                </div>
+                <div class="row mx-auto rounded-title">
+                    <h3 id="welcome">Start Chatting</h3>
+                </div>
+                <div class=" row w-100 p-2 d-flex justify-content-center">
+                    <div id="output" class="col-10" style="height: 400px; overflow:auto; overflow-y:scroll;"></div>
+                </div>
+                <div class="row w-100 d-flex justify-content-center">
+                    <div class="col-10">
+                        <input class="form-control" type="text" id="msg" onkeydown="if (event.keyCode == 13)
+                        document.getElementById('send').click()" /><br>
+                    </div>
+                    <div class="col-1">
+                        <button class="btn btn-purple" id="send" onclick="sendInfo()">Send</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
